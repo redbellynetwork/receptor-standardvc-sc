@@ -1,0 +1,13 @@
+name: pr-check
+
+on:
+  pull_request:
+    types: [reopened, opened, synchronize, edited]
+
+jobs:
+  static-check:
+    uses: ./.github/workflows/static-check.yaml
+    secrets: inherit
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets: inherit
