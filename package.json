@@ -1,0 +1,30 @@
+{
+  "name": "receptor-standardvc-sc",
+  "version": "1.0.0",
+  "description": "A collection of Receptor standard smart contracts and interfaces",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "lint-check:solidity": "solhint \"src/**/*.sol\"",
+    "format-check:solidity": "prettier --check \"src/**/*.sol\"",
+    "lint-fix:solidity": "solhint --fix \"src/**/*.sol\"",
+    "format:solidity": "prettier --write \"src/**/*.sol\""
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.19",
+    "prettier": "^3.5.3",
+    "prettier-plugin-solidity": "^1.4.2",
+    "solhint": "^5.0.5"
+  },
+  "files": [
+    "./src/**/*.sol"
+  ]
+}
