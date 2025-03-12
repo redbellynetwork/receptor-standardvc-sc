@@ -6,7 +6,7 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GIT_ACTIONS_TOKEN }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -31,6 +31,6 @@ jobs:
           coverage-files: coverage/lcov.info
           minimum-coverage: 70
           artifact-name: code-coverage-report
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GIT_ACTIONS_TOKEN }}
           working-directory: src
           update-comment: true

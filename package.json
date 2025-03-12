@@ -1,7 +1,8 @@
 {
-  "name": "receptor-standardvc-sc",
+  "name": "@redbellynetwork/receptor-standardvc-sc",
   "version": "1.0.0",
   "description": "A collection of Receptor standard smart contracts and interfaces",
+  "main": "README.md",
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
@@ -14,7 +15,9 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "keywords": [],
+  "keywords": [
+    "receptor-standardvc-sc"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -23,6 +26,9 @@
     "prettier": "^3.5.3",
     "prettier-plugin-solidity": "^1.4.2",
     "solhint": "^5.0.5"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@redbellynetwork"
   },
   "files": [
     "./src/**/*.sol"
