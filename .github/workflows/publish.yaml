@@ -31,7 +31,7 @@ jobs:
       # Authenticate to GitHub Packages
       - name: Authenticate to GitHub Packages
         run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" > ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GIT_ACTIONS_TOKEN }}" > ~/.npmrc
 
       # Bump the version based on the input ('patch', 'minor', 'major')
       - name: Bump version
