@@ -31,7 +31,9 @@ jobs:
       # Authenticate to GitHub Packages
       - name: Authenticate to GitHub Packages
         run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GIT_ACTIONS_TOKEN }}" > ~/.npmrc
+          echo "@redbellynetwork:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GIT_ACTIONS_TOKEN }}" >> ~/.npmrc
+          echo "always-auth=true" >> ~/.npmrc
 
       # Bump the version based on the input ('patch', 'minor', 'major')
       - name: Bump version
