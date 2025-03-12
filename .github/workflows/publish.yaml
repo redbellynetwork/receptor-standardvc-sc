@@ -1,17 +1,8 @@
 name: Publish Solidity Contracts to GitHub Packages
 
 on:
-  workflow_dispatch:
-    inputs:
-      version_bump:
-        description: "Type of version bump"
-        required: true
-        default: "patch"
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
+  pull_request:
+    types: [reopened, opened, synchronize, edited]
 
 jobs:
   publish:
@@ -35,8 +26,8 @@ jobs:
       # Bump the version based on the input ('patch', 'minor', 'major')
       - name: Bump version
         run: |
-          echo "Bumping version to ${{ inputs.version_bump }}"
-          npm version ${{ inputs.version_bump }} -m "Bump version to %s"  # Bumps version and creates a new Git commit
+          echo "Bumping version to patch"
+          npm version patch -m "Bump version to %s"  # Bumps version and creates a new Git commit
 
       # Publish to GitHub Packages
       - name: Publish package to GitHub Packages
