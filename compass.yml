@@ -1,0 +1,18 @@
+name: redbellynetwork/receptor-standardvc-sc
+id: "ari:cloud:compass:1794ff3d-579e-455b-ae19-07f3651d7bb2:component/8f784f5d-165e-48a8-800f-432089cd8105/ee7819fa-7675-49ca-89e9-460144ebfe09"
+description: Standard vc for receptor
+configVersion: 1
+typeId: LIBRARY
+ownerId: "ari:cloud:identity::team/97cd924d-51ad-48b2-b253-863a8b7f7483"
+fields:
+  tier: 4
+links:
+  - name: redbellynetwork/receptor-standardvc-sc
+    type: REPOSITORY
+    url: "https://github.com/redbellynetwork/receptor-standardvc-sc"
+relationships:
+  DEPENDS_ON: []
+labels:
+  - language:typescript
+  - source:github
+customFields: null

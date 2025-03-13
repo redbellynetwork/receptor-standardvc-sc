@@ -1,0 +1,54 @@
+name: Publish Solidity Contracts to GitHub Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: "Type of version bump"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      - name: Configure Git user with GitHub Actor
+        run: |
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global user.name "${GITHUB_ACTOR}"
+
+      # Authenticate to GitHub Packages
+      - name: Authenticate to GitHub Packages
+        run: |
+          echo "@redbellynetwork:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GIT_ACTIONS_TOKEN }}" >> ~/.npmrc
+          echo "always-auth=true" >> ~/.npmrc
+
+      # Bump the version based on the input ('patch', 'minor', 'major')
+      - name: Bump version
+        run: |
+          echo "Bumping version to ${{ inputs.version_bump }}"
+          npm version ${{ inputs.version_bump }} -m "Bump version to %s"  # Bumps version and creates a new Git commit
+      # Publish to GitHub Packages
+      - name: Publish package to GitHub Packages
+        run: |
+          npm publish --access=restricted  # Publish to GitHub Packages (private registry)

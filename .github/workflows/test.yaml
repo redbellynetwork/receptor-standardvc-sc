@@ -1,0 +1,36 @@
+name: test
+
+on:
+  workflow_call:
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GIT_ACTIONS_TOKEN }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+        shell: bash
+      - name: Generate artifacts
+        run: npm run compile
+        shell: bash
+      - name: Run Coverage
+        run: npm run coverage
+        shell: bash
+      - name: Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
+      - name: Report code coverage
+        uses: zgosalvez/github-actions-report-lcov@v4.1.21
+        with:
+          coverage-files: coverage/lcov.info
+          minimum-coverage: 70
+          artifact-name: code-coverage-report
+          github-token: ${{ secrets.GIT_ACTIONS_TOKEN }}
+          working-directory: src
+          update-comment: true

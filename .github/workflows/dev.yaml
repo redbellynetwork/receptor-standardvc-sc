@@ -1,0 +1,30 @@
+name: dev-push
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  static-check:
+    uses: ./.github/workflows/static-check.yaml
+    secrets: inherit
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets: inherit
+  compass-success:
+    needs: [static-check, test]
+    if: success()
+    uses: ./.github/workflows/compass-status.yaml
+    with:
+      compassId: ari:cloud:compass:1794ff3d-579e-455b-ae19-07f3651d7bb2:metric-source/8f784f5d-165e-48a8-800f-432089cd8105/ff8c44b0-59ec-427e-87a4-2e0c0e732783
+      metricValue: 1
+    secrets: inherit
+  compass-failure:
+    needs: [static-check, test]
+    if: failure()
+    uses: ./.github/workflows/compass-status.yaml
+    with:
+      compassId: ari:cloud:compass:1794ff3d-579e-455b-ae19-07f3651d7bb2:metric-source/8f784f5d-165e-48a8-800f-432089cd8105/ff8c44b0-59ec-427e-87a4-2e0c0e732783
+      metricValue: 0
+    secrets: inherit
