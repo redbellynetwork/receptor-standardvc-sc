@@ -1,8 +1,7 @@
 {
   "name": "@redbellynetwork/receptor-standardvc-sc",
-  "version": "1.1.0",
+  "version": "0.0.2",
   "description": "A collection of Receptor standard smart contracts and interfaces",
-  "main": "README.md",
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
@@ -10,7 +9,8 @@
     "lint-check:solidity": "solhint \"src/**/*.sol\"",
     "format-check:solidity": "prettier --check \"src/**/*.sol\"",
     "lint-fix:solidity": "solhint --fix \"src/**/*.sol\"",
-    "format:solidity": "prettier --write \"src/**/*.sol\""
+    "format:solidity": "prettier --write \"src/**/*.sol\"",
+    "build": "tsc"
   },
   "engines": {
     "node": ">=20.0.0"
