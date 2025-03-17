@@ -1,6 +1,6 @@
 {
-  "name": "@redbellynetwork/receptor-standardvc-sc",
-  "version": "0.0.2",
+  "name": "@redbellynetwork/receptor-standard-vc-sccs",
+  "version": "0.0.1",
   "description": "A collection of Receptor standard smart contracts and interfaces",
   "scripts": {
     "compile": "hardhat compile",
@@ -29,6 +29,10 @@
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@redbellynetwork"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redbellynetwork/receptor-standardvc-sc.git"
   },
   "files": [
     "./src/**/*.sol"
