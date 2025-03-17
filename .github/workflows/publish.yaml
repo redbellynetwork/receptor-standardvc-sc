@@ -36,8 +36,8 @@ jobs:
           echo "Bumping version to patch"
           npm version patch -m "Bump version to %s"  # Bumps version and creates a new Git commit
           git add package.json  # Stage changes to package.json
-          git commit -m "Update version to patch"  # Commit the version bump
-          git push
+          git commit -m "Bump version to $(node -p -e "require('./package.json').version")" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GIT_ACTIONS_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
 
       # Publish to GitHub Packages
       - name: Publish package to GitHub Packages
