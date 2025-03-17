@@ -12,6 +12,8 @@ jobs:
       # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }} # Explicitly check out the source branch of the PR
 
       # Set up Node.js
       - name: Set up Node.js
@@ -23,26 +25,19 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # - name: Configure Git user with GitHub Actor
-      #   run: |
-      #     git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-      #     git config --global user.name "${GITHUB_ACTOR}"
-
-      # Authenticate to GitHub Packages
-      # - name: Authenticate to GitHub Packages
-      #   run: |
-      #     echo "@redbellynetwork:registry=https://npm.pkg.github.com" >> ~/.npmrc
-      #     echo "//npm.pkg.github.com/:_authToken=${{ secrets.GIT_ACTIONS_TOKEN }}" >> ~/.npmrc
-      #     echo "always-auth=true" >> ~/.npmrc
+      - name: Configure Git user with GitHub Actor
+        run: |
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global user.name "${GITHUB_ACTOR}"
 
       # Bump the version based on the input ('patch', 'minor', 'major')
-      # - name: Bump version
-      #   run: |
-      #     echo "Bumping version to patch"
-      #     npm version patch -m "Bump version to %s"  # Bumps version and creates a new Git commit
-      #     git add package.json  # Stage changes to package.json
-      #     git commit -m "Update version to patch"  # Commit the version bump
-      #     git push https://x-access-token:${{ secrets.GIT_ACTIONS_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+      - name: Bump version
+        run: |
+          echo "Bumping version to patch"
+          npm version patch -m "Bump version to %s"  # Bumps version and creates a new Git commit
+          git add package.json  # Stage changes to package.json
+          git commit -m "Update version to patch"  # Commit the version bump
+          git push
 
       # Publish to GitHub Packages
       - name: Publish package to GitHub Packages
