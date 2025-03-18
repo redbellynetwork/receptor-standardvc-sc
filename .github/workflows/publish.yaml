@@ -1,19 +1,19 @@
-name: Publish Solidity Contracts to GitHub Packages
+name: create-publish-release
 
 on:
   workflow_dispatch:
-    inputs:
-      version_bump:
-        description: "Type of version bump"
-        required: true
-        default: "patch"
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-  pull_request:
-    types: [reopened, opened, synchronize, edited]
+  # inputs:
+  #   version_bump:
+  #     description: "Type of version bump"
+  #     required: true
+  #     default: "patch"
+  #     type: choice
+  #     options:
+  #       - patch
+  #       - minor
+  #       - major
+  # pull_request:
+  #   types: [reopened, opened, synchronize, edited]
 
 jobs:
   publish:
@@ -22,8 +22,8 @@ jobs:
       # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }} # Explicitly check out the source branch of the PR
+        # with:
+        #   ref: ${{ github.head_ref }} # Explicitly check out the source branch of the PR
 
       # Set up Node.js
       - name: Set up Node.js
@@ -35,19 +35,54 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Configure Git user with GitHub Actor
-        run: |
-          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git config --global user.name "${GITHUB_ACTOR}"
+      # - name: Configure Git user with GitHub Actor
+      #   run: |
+      #     git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      #     git config --global user.name "${GITHUB_ACTOR}"
 
-      # Bump the version based on the input ('patch', 'minor', 'major')
-      - name: Bump version
+      # # Bump the version based on the input ('patch', 'minor', 'major')
+      # - name: Bump version
+      #   run: |
+      #     echo "Bumping version to ${{ inputs.version_bump }}"
+      #     npm version ${{ inputs.version_bump }} -m "Bump version %s" # Bumps version and creates a new Git commit
+      #     git add package.json  # Stage changes to package.json
+      #     git commit -m "Bump version to $(node -p -e "require('./package.json').version")" || echo "No changes to commit"
+      #     git push
+
+      # Set the version_date variable based on package.json and current date
+      - name: Set version and date variables
+        id: version_date
         run: |
-          echo "Bumping version to ${{ inputs.version_bump }}"
-          npm version ${{ inputs.version_bump }} -m "Bump version to %s" # Bumps version and creates a new Git commit
-          git add package.json  # Stage changes to package.json
-          git commit -m "Bump version to $(node -p -e "require('./package.json').version")" || echo "No changes to commit"
-          git push
+          echo "::set-output name=version::$(node -p -e \"require('./package.json').version\")"  
+          echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      # Output version and date to confirm
+      - name: Output version and date
+        run: |
+          echo "Current version is ${{ steps.version_date.outputs.version }} and Date is ${{ steps.version_date.outputs.date }}"
+
+      # Create a Git tag and push the tag
+      - name: Create and push Git tag
+        run: |
+          git tag "v${{ steps.version_date.outputs.version }}"  # Directly use the "v" prefix in git tag
+          git push origin "v${{ steps.version_date.outputs.version }}"  # Push the new tag to the remote repository
+
+      # Generate a changelog based on the commits since the last release
+      - name: Build Changelog
+        id: build_changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create a release based on the tag and changelog
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.version_date.outputs.version }}
+          name: Release v${{ steps.version_date.outputs.version }} ${{ steps.version_date.outputs.date }}
+          body: ${{ steps.build_changelog.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Publish to GitHub Packages
       - name: Publish package to GitHub Packages

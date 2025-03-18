@@ -1,6 +1,6 @@
 {
   "name": "@redbellynetwork/receptor-standard-vc-sccs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A collection of Receptor standard smart contracts and interfaces",
   "scripts": {
     "compile": "hardhat compile",
