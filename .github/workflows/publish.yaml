@@ -1,21 +1,13 @@
-name: Publish Solidity Contracts to GitHub Packages
+name: create-publish-release
 
 on:
   workflow_dispatch:
-    inputs:
-      version_bump:
-        description: "Type of version bump"
-        required: true
-        default: "patch"
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-jobs:
-  publish:
-    runs-on: ubuntu-latest
 
+jobs:
+  create-publish:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # Checkout the repository
       - name: Checkout code
@@ -31,24 +23,39 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Configure Git user with GitHub Actor
+      # Set the version_date variable based on package.json and current date
+      - name: Set version and date variables
         run: |
-          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git config --global user.name "${GITHUB_ACTOR}"
+          echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+          echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      # Authenticate to GitHub Packages
-      - name: Authenticate to GitHub Packages
+      # Output version and date to confirm
+      - name: Output version and date
         run: |
-          echo "@redbellynetwork:registry=https://npm.pkg.github.com" >> ~/.npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GIT_ACTIONS_TOKEN }}" >> ~/.npmrc
-          echo "always-auth=true" >> ~/.npmrc
+          echo "Current version is ${{ env.VERSION }} and Date is ${{ env.DATE }}"
 
-      # Bump the version based on the input ('patch', 'minor', 'major')
-      - name: Bump version
+      # Create a Git tag and push the tag
+      - name: Create and push Git tag
         run: |
-          echo "Bumping version to ${{ inputs.version_bump }}"
-          npm version ${{ inputs.version_bump }} -m "Bump version to %s"  # Bumps version and creates a new Git commit
+          git tag "v${{ env.VERSION }}" 
+          git push origin "v${{ env.VERSION }}"
+
+      # Generate a changelog based on the commits since the last release
+      - name: Build Changelog
+        id: build_changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create a release based on the tag and changelog
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }} ${{ env.DATE }}
+          body: ${{ steps.build_changelog.outputs.changelog }}
+
       # Publish to GitHub Packages
       - name: Publish package to GitHub Packages
         run: |
-          npm publish --access=restricted  # Publish to GitHub Packages (private registry)
+          npm publish
