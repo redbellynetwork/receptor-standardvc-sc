@@ -9,8 +9,7 @@
     "lint-check:solidity": "solhint \"src/**/*.sol\"",
     "format-check:solidity": "prettier --check \"src/**/*.sol\"",
     "lint-fix:solidity": "solhint --fix \"src/**/*.sol\"",
-    "format:solidity": "prettier --write \"src/**/*.sol\"",
-    "build": "tsc"
+    "format:solidity": "prettier --write \"src/**/*.sol\""
   },
   "engines": {
     "node": ">=20.0.0"
