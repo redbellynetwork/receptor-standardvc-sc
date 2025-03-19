@@ -8,12 +8,7 @@ contract OptimaVCVerifier is VCVerifierBaseContract {
     mapping(address => bool) public verificationStatus;
 
     // This function will be called automatically from the verify() function of VCVerifierBase
-    function postVerification(
-        string memory _issuerDid,
-        string memory _vcs,
-        string memory _proofSignature,
-        address _userAddress
-    ) internal override {
+    function _postVerification(address _userAddress) internal override {
         verificationStatus[_userAddress] = true;
     }
 }
