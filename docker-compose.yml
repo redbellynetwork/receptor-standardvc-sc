@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
   rbn-node-0:
     # platform: linux/arm64/v8
