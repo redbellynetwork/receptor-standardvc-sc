@@ -19,12 +19,17 @@ const config: HardhatUserConfig = {
     artifacts: "./artifacts",
   },
   mocha: {
-    timeout: 20000, // Increase the timeout value if needed
+    timeout: 200000, // Increase the timeout value if needed
   },
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
       chainId: 31337,
+    },
+    local: {
+      accounts: ["0x1f36dd877bfa8a8946ed49441b7767db5cddc0d82822641335c483ba7760abb5"],
+      url: "http://localhost:8545",
+      chainId: 161,
     },
   },
 };
