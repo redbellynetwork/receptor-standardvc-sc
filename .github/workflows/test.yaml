@@ -4,10 +4,21 @@ on:
   workflow_call:
 jobs:
   test:
+    timeout-minutes: 60
     runs-on: ubuntu-22.04
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.34.1
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
@@ -18,11 +29,18 @@ jobs:
       - name: Generate artifacts
         run: npm run compile
         shell: bash
+      - name: Run task buildChain
+        run: task buildChain
+      - name: Run test
+        run: npm run test
+        shell: bash
       - name: Run Coverage
         run: npm run coverage
         shell: bash
       - name: Setup LCOV
         uses: hrishikesh-kadam/setup-lcov@v1
+      - name: Clean up Docker containers
+        run: docker compose -f docker-compose.yml down
       - name: Report code coverage
         uses: zgosalvez/github-actions-report-lcov@v4.1.21
         with:

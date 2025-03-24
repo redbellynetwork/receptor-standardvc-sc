@@ -5,8 +5,6 @@ on:
 jobs:
   static-check:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GIT_ACTIONS_TOKEN }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
