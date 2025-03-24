@@ -25,6 +25,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       chainId: 31337,
+      blockGasLimit: 0x1fffffffffffff,
     },
     local: {
       accounts: ["0x1f36dd877bfa8a8946ed49441b7767db5cddc0d82822641335c483ba7760abb5"],
