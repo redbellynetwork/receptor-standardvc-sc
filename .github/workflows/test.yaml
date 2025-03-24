@@ -30,7 +30,9 @@ jobs:
         run: npm run compile
         shell: bash
       - name: Run task buildChain
-        run: task buildChain
+        run: |
+          task buildChain
+          sleep 30 # Wait for 30 seconds
       - name: Run test
         run: npm run test
         shell: bash
