@@ -6,6 +6,8 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-22.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
