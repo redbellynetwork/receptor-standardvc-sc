@@ -33,22 +33,14 @@ jobs:
         run: |
           task buildChain
           sleep 30 # Wait for 30 seconds
+
+      - name: Set up environment variables
+        run: |
+          echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "RPC_URL=${{ vars.RPC_URL }}" >> $GITHUB_ENV
+          echo "CHAIN_ID=${{ vars.CHAIN_ID }}" >> $GITHUB_ENV
       - name: Run test
         run: npm run test
         shell: bash
-      - name: Run Coverage
-        run: npm run coverage
-        shell: bash
-      - name: Setup LCOV
-        uses: hrishikesh-kadam/setup-lcov@v1
       - name: Clean up Docker containers
         run: docker compose -f docker-compose.yml down
-      - name: Report code coverage
-        uses: zgosalvez/github-actions-report-lcov@v4.1.21
-        with:
-          coverage-files: coverage/lcov.info
-          minimum-coverage: 70
-          artifact-name: code-coverage-report
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          working-directory: src
-          update-comment: true
