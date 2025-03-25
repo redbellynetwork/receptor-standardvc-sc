@@ -18,12 +18,11 @@ A collection of Receptor standard smart contracts and interfaces
 
 ### How to test Upgradeable Smart contracts
 
+- Run task buildChain to run local chain to test contracts
+  `task buildChain`
+
 - Run the unit tests via following command
   `npm run test`
-
-### How to check the test coverage
-
-- Use `npm run coverage` command
 
 ### How to clean typechain types and artifacts
 

@@ -5,8 +5,6 @@ on:
 jobs:
   static-check:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GIT_ACTIONS_TOKEN }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -16,9 +14,6 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm install
-        shell: bash
-      - name: Generate artifacts
-        run: npm run compile
         shell: bash
       - name: Solidity lint check
         run: npm run lint-check:solidity
