@@ -1,6 +1,5 @@
 services:
   rbn-node-0:
-    # platform: linux/arm64/v8
     image: ghcr.io/redbellynetwork/sevm-docker-full:20250227-001456
     container_name: rbn-node-0
     ports:
@@ -12,7 +11,6 @@ services:
       - SIGNING_KEY=211584689e71d1a45a7de6404f90402dc58b6867e6941f6026870727c73f2ffb
       - AUTH_PORT=10240
   rbn-node-1:
-    # platform: linux/arm64/v8
     image: ghcr.io/redbellynetwork/sevm-docker-full:20250227-001456
     container_name: rbn-node-1
     depends_on:
@@ -26,7 +24,6 @@ services:
       - SIGNING_KEY=6b1eb2d75ab719b147d6a3d9ab3828da63b8693b22190baf79eac9ccdb36a492
       - AUTH_PORT=10240
   rbn-node-2:
-    # platform: linux/arm64/v8
     image: ghcr.io/redbellynetwork/sevm-docker-full:20250227-001456
     container_name: rbn-node-2
     depends_on:
@@ -40,7 +37,6 @@ services:
       - SIGNING_KEY=a89260d1beca7d94b7ff14569a097539b152d8c99f3baf6eebbb9bf8fb543838
       - AUTH_PORT=10240
   rbn-node-3:
-    # platform: linux/arm64/v8
     depends_on:
       - rbn-node-2
     image: ghcr.io/redbellynetwork/sevm-docker-full:20250227-001456
