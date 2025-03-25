@@ -11,7 +11,10 @@ contract OptimaVCVerifier is VCVerifierBaseContract {
      * @dev Constructor to set the VCVerifierBaseContract
      * @param _credentialType The type of the credential(schema)
      */
-    constructor(string memory _credentialType) VCVerifierBaseContract(_credentialType) {}
+    constructor(
+        string memory _credentialType,
+        address _bootstrapContractsRegistryAddress
+    ) VCVerifierBaseContract(_credentialType, _bootstrapContractsRegistryAddress) {}
 
     /**
      * @dev The function that will be executed after the verification is successful from the verifyCredential function.
