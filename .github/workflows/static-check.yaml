@@ -15,9 +15,6 @@ jobs:
       - name: Install dependencies
         run: npm install
         shell: bash
-      - name: Generate artifacts
-        run: npm run compile
-        shell: bash
       - name: Solidity lint check
         run: npm run lint-check:solidity
         shell: bash
