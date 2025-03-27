@@ -33,7 +33,6 @@ jobs:
           echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
           echo "RPC_URL=${{ vars.RPC_URL }}" >> $GITHUB_ENV
           echo "CHAIN_ID=${{ vars.CHAIN_ID }}" >> $GITHUB_ENV
-          echo "BOOTSTRAP_REGISTRY_CONTRACT_ADDRESS=${{ vars.BOOTSTRAP_REGISTRY_CONTRACT_ADDRESS }}" >> $GITHUB_ENV
           echo "IDP_DID=${{ vars.IDP_DID }}" >> $GITHUB_ENV
       - name: Generate artifacts
         run: npm run compile
