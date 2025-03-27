@@ -44,7 +44,6 @@ abstract contract VCVerifierBaseContract {
         string memory proofType = _parseJson("type", _proofSignature);
         string memory publicKey = _getProofPublicKey(proofType, _issuerDid);
 
-        // check the vc has not been modified by signature
         string memory proofValue = _parseJson("proofValue", _proofSignature);
 
         // Remove the 'z' prefix from proofValue before decoding
