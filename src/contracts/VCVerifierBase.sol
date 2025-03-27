@@ -10,8 +10,8 @@ abstract contract VCVerifierBaseContract {
     /// @dev - The type of credential(schema) to verify
     string public credentialType;
 
-    /// @dev - Bootstrap Registry Contract
-    IBootstrapContractsRegistry private _bootstrapContractsRegistry;
+    /// @dev - Bootstrap Registry Contract Address
+    address private constant bootstrapContractsRegistryAddress = 0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5;
 
     error InvalidData(string);
     error InvalidProof(string);
@@ -20,14 +20,15 @@ abstract contract VCVerifierBaseContract {
      * @dev Constructor to set the VCVerifierBaseContract
      * @param _credentialType The type of the credential(schema)
      */
-    constructor(string memory _credentialType, address _bootstrapContractsRegistryAddress) {
+    constructor(string memory _credentialType) {
         credentialType = _credentialType;
-        _bootstrapContractsRegistry = IBootstrapContractsRegistry(_bootstrapContractsRegistryAddress);
     }
 
     /**
      * @dev Internal function that cannot be modified in the derived contract
+     * @param _issuerDid ID of the issuer who've issued the credentials.
      * @param _vc credential issued by issuer without proof
+     * @param _proofSignature proof of the credentials issued.
      */
     function verifyCredential(string memory _issuerDid, string memory _vc, string memory _proofSignature) public {
         // Fetching type field(array of schemas) from the credential
@@ -41,19 +42,18 @@ abstract contract VCVerifierBaseContract {
         }
 
         string memory proofType = _parseJson("type", _proofSignature);
-        string memory publicKey = getProofpublicKey(proofType, _issuerDid);
+        string memory publicKey = getProofPublicKey(proofType, _issuerDid);
 
         // check the vc has not been modified by signature
         string memory proofValue = _parseJson("proofValue", _proofSignature);
+
         // Remove the 'z' prefix from proofValue before decoding
         if (bytes(proofValue)[0] == "z") {
             proofValue = _sliceString(proofValue, 1, bytes(proofValue).length);
         }
 
         bytes memory decodedProofValue = Base58.decodeFromString(proofValue);
-
         bool signatureCheck = _verifyED25519(_vc, decodedProofValue, bytes32(JsonFormatter.base64ToBytes(publicKey)));
-
         if (!signatureCheck) {
             revert InvalidData("Signature verification failed");
         }
@@ -70,13 +70,13 @@ abstract contract VCVerifierBaseContract {
 
     /**
      * @dev Checks if a given value exists in a comma-separated string.
-     * @param str The string to check.
-     * @param value The value to search for.
+     * @param _str The string to check.
+     * @param _value The value to search for.
      * @return true if the value exists in the string, false otherwise.
      */
-    function _contains(string memory str, string memory value) internal pure returns (bool) {
-        bytes memory strBytes = bytes(str);
-        bytes memory valueBytes = bytes(value);
+    function _contains(string memory _str, string memory _value) internal pure returns (bool) {
+        bytes memory strBytes = bytes(_str);
+        bytes memory valueBytes = bytes(_value);
 
         // Ensure that strBytes is large enough to fit valueBytes
         if (strBytes.length < valueBytes.length) {
@@ -101,15 +101,15 @@ abstract contract VCVerifierBaseContract {
 
     /**
      * @dev Parses the JSON content at the specified path.
-     * @param path The JSON path string.
-     * @param content The content string.
+     * @param _path The JSON path string.
+     * @param _content The content string.
      * @return The parsed string value at the specified path.
      */
-    function _parseJson(string memory path, string memory content) internal returns (string memory) {
+    function _parseJson(string memory _path, string memory _content) internal returns (string memory) {
         bool callresult = false;
 
         // Format the JSON path request
-        bytes memory requestData = JsonFormatter.formatJsonPathRequest(path, content);
+        bytes memory requestData = JsonFormatter.formatJsonPathRequest(_path, _content);
 
         // Create a new bytes array for the result
         bytes memory ret = new bytes(requestData.length);
@@ -131,12 +131,22 @@ abstract contract VCVerifierBaseContract {
         return JsonFormatter.trimEmpty(string(ret));
     }
 
-    function getProofpublicKey(
+    /**
+     * @dev Fetch the public key of issuer who issued credential
+     * @param _proofType The type of proof in credential
+     * @param _issuerDid ID of the issuer who've issued the credentials.
+     * @return The public key string value
+     */
+    function getProofPublicKey(
         string memory _proofType,
         string memory _issuerDid
-    ) public view virtual returns (string memory) {
+    ) internal view virtual returns (string memory) {
+        IBootstrapContractsRegistry bootstrapContractsRegistry = IBootstrapContractsRegistry(
+            bootstrapContractsRegistryAddress
+        );
+
         IIDPRegistry.IDPInformationIO memory idpInfo = IIDPRegistry(
-            _bootstrapContractsRegistry.getContractAddress("idpregistry")
+            bootstrapContractsRegistry.getContractAddress("idpregistry")
         ).getByIssuerDid(_issuerDid);
 
         IIDPRegistry.Proof[] memory proofs = idpInfo.proofs;
@@ -148,37 +158,48 @@ abstract contract VCVerifierBaseContract {
         revert InvalidProof("proof type doesn't exists");
     }
 
-    // Utility function to slice a string
+    /**
+     * @dev Slices a given string from a start index to an end index.
+     * @param _str The original string to be sliced.
+     * @param _startIndex The index at which the slicing starts (inclusive).
+     * @param _endIndex The index at which the slicing ends (exclusive).
+     * @return A new string that contains the sliced portion of the original string.
+     */
     function _sliceString(
-        string memory str,
-        uint256 startIndex,
-        uint256 endIndex
+        string memory _str,
+        uint256 _startIndex,
+        uint256 _endIndex
     ) internal pure returns (string memory) {
-        bytes memory strBytes = bytes(str);
-        bytes memory result = new bytes(endIndex - startIndex);
-        for (uint256 i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = strBytes[i];
+        bytes memory strBytes = bytes(_str);
+        bytes memory result = new bytes(_endIndex - _startIndex);
+        for (uint256 i = _startIndex; i < _endIndex; i++) {
+            result[i - _startIndex] = strBytes[i];
         }
         return string(result);
     }
 
     /**
      * @dev Verifies the ED25519 signature of a proofvalue using a provided VC and IDP public key.
-     * @param vc The VC (Verifiable Credential) string.
-     * @param proofvalue string.
+     * @param _vc The VC (Verifiable Credential) string.
+     * @param _proofvalue string.
+     * @param _idpPublicKey public key of Issuer
      * @return A boolean indicating whether the signature is valid or not.
      */
-    function _verifyED25519(string memory vc, bytes memory proofvalue, bytes32 _idpPublicKey) internal returns (bool) {
+    function _verifyED25519(
+        string memory _vc,
+        bytes memory _proofvalue,
+        bytes32 _idpPublicKey
+    ) internal returns (bool) {
         bool callresult = false;
 
         // Create a new bytes array for the hash
         bytes memory hash = new bytes(32);
 
         assembly {
-            let len := mload(vc)
+            let len := mload(_vc)
 
             // Call precompile contract to calculate the hash
-            callresult := call(gas(), 2, 0, add(vc, 0x20), len, add(hash, 0x20), 32)
+            callresult := call(gas(), 2, 0, add(_vc, 0x20), len, add(hash, 0x20), 32)
 
             // Check the result of the call
             switch callresult
@@ -188,7 +209,7 @@ abstract contract VCVerifierBaseContract {
         }
 
         // Encode the request by concatenating the hash and other data
-        bytes memory requestData = abi.encodePacked(hash, abi.encodePacked(_idpPublicKey, proofvalue));
+        bytes memory requestData = abi.encodePacked(hash, abi.encodePacked(_idpPublicKey, _proofvalue));
 
         // Create a new bytes array for the result
         bytes memory result = new bytes(32);
