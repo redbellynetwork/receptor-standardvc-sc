@@ -11,7 +11,7 @@ abstract contract VCVerifierBaseContract {
     string public credentialType;
 
     /// @dev - Bootstrap Registry Contract Address
-    address private constant bootstrapContractsRegistryAddress = 0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5;
+    address private constant _BOOTSTRAP_CONTRACTS_REGISTRY_ADDRESS = 0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5;
 
     error InvalidData(string);
     error InvalidProof(string);
@@ -42,7 +42,7 @@ abstract contract VCVerifierBaseContract {
         }
 
         string memory proofType = _parseJson("type", _proofSignature);
-        string memory publicKey = getProofPublicKey(proofType, _issuerDid);
+        string memory publicKey = _getProofPublicKey(proofType, _issuerDid);
 
         // check the vc has not been modified by signature
         string memory proofValue = _parseJson("proofValue", _proofSignature);
@@ -137,12 +137,12 @@ abstract contract VCVerifierBaseContract {
      * @param _issuerDid ID of the issuer who've issued the credentials.
      * @return The public key string value
      */
-    function getProofPublicKey(
+    function _getProofPublicKey(
         string memory _proofType,
         string memory _issuerDid
     ) internal view virtual returns (string memory) {
         IBootstrapContractsRegistry bootstrapContractsRegistry = IBootstrapContractsRegistry(
-            bootstrapContractsRegistryAddress
+            _BOOTSTRAP_CONTRACTS_REGISTRY_ADDRESS
         );
 
         IIDPRegistry.IDPInformationIO memory idpInfo = IIDPRegistry(
