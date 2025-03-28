@@ -12,15 +12,15 @@ library Base58 {
 
     /**
      * @notice decode is used to decode the given string in base58 standard.
-     * @param data_ data encoded with base58, passed in as bytes.
+     * @param data data encoded with base58, passed in as bytes.
      * @return raw data, returned as bytes.
      */
-    function decode(bytes memory data_) public pure returns (bytes memory) {
+    function decode(bytes memory data) public pure returns (bytes memory) {
         unchecked {
             uint256 zero = 49;
-            uint256 b58sz = data_.length;
+            uint256 b58sz = data.length;
             uint256 zcount = 0;
-            for (uint256 i = 0; i < b58sz && uint8(data_[i]) == zero; i++) {
+            for (uint256 i = 0; i < b58sz && uint8(data[i]) == zero; i++) {
                 zcount++;
             }
             uint256 t;
@@ -28,8 +28,8 @@ library Base58 {
             bool f;
             bytes memory binu = new bytes(2 * (((b58sz * 8351) / 6115) + 1));
             uint32[] memory outi = new uint32[]((b58sz + 3) / 4);
-            for (uint256 i = 0; i < data_.length; i++) {
-                bytes1 r = data_[i];
+            for (uint256 i = 0; i < data.length; i++) {
+                bytes1 r = data[i];
                 (c, f) = indexOf(ALPHABET, r);
                 require(f, "invalid base58 digit");
                 for (int256 k = int256(outi.length) - 1; k >= 0; k--) {
@@ -66,40 +66,40 @@ library Base58 {
 
     /**
      * @notice decode is used to decode the given string in base58 standard.
-     * @param data_ data encoded with base58, passed in as string.
+     * @param data data encoded with base58, passed in as string.
      * @return raw data, returned as bytes.
      */
-    function decodeFromString(string memory data_) public pure returns (bytes memory) {
-        return decode(bytes(data_));
+    function decodeFromString(string memory data) public pure returns (bytes memory) {
+        return decode(bytes(data));
     }
 
     /**
      * @notice slice is used to slice the given byte, returns the bytes in the range of [start_, end_)
-     * @param data_ raw data, passed in as bytes.
-     * @param start_ start index.
-     * @param end_ end index.
+     * @param data raw data, passed in as bytes.
+     * @param start start index.
+     * @param end end index.
      * @return slice data
      */
-    function slice(bytes memory data_, uint256 start_, uint256 end_) public pure returns (bytes memory) {
+    function slice(bytes memory data, uint256 start, uint256 end) public pure returns (bytes memory) {
         unchecked {
-            bytes memory ret = new bytes(end_ - start_);
-            for (uint256 i = 0; i < end_ - start_; i++) {
-                ret[i] = data_[i + start_];
+            bytes memory ret = new bytes(end - start);
+            for (uint256 i = 0; i < end - start; i++) {
+                ret[i] = data[i + start];
             }
             return ret;
         }
     }
 
     /**
-     * @notice indexOf is used to find where char_ appears in data_.
-     * @param data_ raw data, passed in as bytes.
-     * @param char_ target byte.
+     * @notice indexOf is used to find where char_ appears in data.
+     * @param data raw data, passed in as bytes.
+     * @param char target byte.
      * @return index, and whether the search was successful.
      */
-    function indexOf(bytes memory data_, bytes1 char_) public pure returns (uint256, bool) {
+    function indexOf(bytes memory data, bytes1 char) public pure returns (uint256, bool) {
         unchecked {
-            for (uint256 i = 0; i < data_.length; i++) {
-                if (data_[i] == char_) {
+            for (uint256 i = 0; i < data.length; i++) {
+                if (data[i] == char) {
                     return (i, true);
                 }
             }
