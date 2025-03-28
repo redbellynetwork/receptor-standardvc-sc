@@ -3,6 +3,7 @@ pragma solidity 0.8.22;
 
 import {JsonFormatter} from "../libraries/JsonFormatter.sol";
 import {Base58} from "../libraries/Base58.sol";
+import {TimeParserUtils} from "../libraries/TimeParserUtils.sol";
 import {IIDPRegistry} from "../interfaces/IIDPRegistry.sol";
 import {IBootstrapContractsRegistry} from "@redbellynetwork/bootstrap-contracts/src/contracts/interfaces/IBootstrapContractsRegistry.sol";
 
@@ -41,6 +42,14 @@ abstract contract VCVerifierBaseContract {
             revert InvalidData("Credential type not exist");
         }
 
+        // Check the validFrom date is in past
+        string memory validFrom = _parseJson("validFrom", vc);
+        uint256 validFromUnix = _convertTimestampStringToUnix(validFrom);
+        if (validFromUnix >= block.timestamp) {
+            revert InvalidData("validFrom date must be in the past");
+        }
+
+        // Checking the proof signature is valid or not
         string memory proofType = _parseJson("type", proofSignature);
         string memory publicKey = _getProofPublicKey(proofType, issuerDid);
 
@@ -231,5 +240,40 @@ abstract contract VCVerifierBaseContract {
 
         // If no non-zero byte is found, return false
         return false;
+    }
+
+    /**
+     * @dev Converts a timestamp string to a Unix timestamp (seconds since epoch).
+     * @param timestampString The string representing the timestamp to be converted.
+     * @return A uint256 value representing the Unix timestamp corresponding to the input string.
+     */
+    function _convertTimestampStringToUnix(string memory timestampString) internal returns (uint256) {
+        bool callresult = false;
+
+        // Format the JSON path request
+        bytes memory requestData = TimeParserUtils.formatTimeParserRequest(
+            timestampString,
+            TimeParserUtils.RFC3339NANO
+        );
+
+        // Create a new bytes array for the result
+        bytes memory ret = new bytes(32);
+
+        assembly {
+            let len := mload(requestData)
+
+            // Call precompile contract with json parser
+            callresult := call(gas(), 103, 0, add(requestData, 0x20), len, add(ret, 0x20), len)
+
+            // Check the result of the call
+            switch callresult
+            case 0 {
+                revert(0, 0)
+            }
+        }
+
+        string memory unitTimestampString = JsonFormatter.trimEmpty(string(ret));
+
+        return TimeParserUtils.stringToUint(unitTimestampString);
     }
 }
