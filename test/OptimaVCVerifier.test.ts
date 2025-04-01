@@ -118,6 +118,38 @@ describe("OptimaVCVerifier", function () {
       .withArgs("validFrom date must be in the past");
   });
 
+  it("Should revert, when validUntil is behind of block timestamp", async function () {
+    const { OptimaVCVerifier, signer, signerAddress } = await deployOptimaVCVerifierFixture();
+
+    const optimaVCVerifier = await OptimaVCVerifier.deploy(credentialType);
+    await optimaVCVerifier.waitForDeployment();
+
+    expect(await optimaVCVerifier.verificationStatus(signerAddress)).to.equal(false);
+
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 2);
+
+    const vc = {
+      id: "123",
+      issuer: idpDid,
+      type: ["OptimaV1Credential", "VerifiableCredential"],
+      validFrom: "2025-03-28T16:52:00.753Z", // validFrom in past
+      validUntil: currentDate.toISOString(), // validUntil behind of current time
+    };
+    const proofSignature = {
+      type: "Ed25519Signature2020",
+      created: currentDate.toISOString(),
+      proofPurpose: "assertionMethod",
+      proofValue: "z2oefavncyewguGve7hnJHcinLre2MTgeRSrxsAq9xkasDzxWhy9qaK4yWDKdjpyMGpsqEm5Zkkdv9Patqhdg8rPa",
+    };
+
+    await expect(
+      optimaVCVerifier.connect(signer).verifyCredential(idpDid, canonicalize(vc)!, canonicalize(proofSignature)!)
+    )
+      .to.be.revertedWithCustomError(optimaVCVerifier, "InvalidData")
+      .withArgs("The validUntil date cannot be in the past");
+  });
+
   it("Should revert, when signature is not valid according to vc", async function () {
     const { OptimaVCVerifier, signer, signerAddress } = await deployOptimaVCVerifierFixture();
 
@@ -126,11 +158,15 @@ describe("OptimaVCVerifier", function () {
 
     expect(await optimaVCVerifier.verificationStatus(signerAddress)).to.equal(false);
 
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 2);
+
     const vc = {
       id: "123",
       issuer: idpDid,
       type: ["OptimaV1Credential", "VerifiableCredential"],
       validFrom: "2025-03-28T16:52:00.753Z", // validFrom in past
+      validUntil: currentDate.toISOString(), // validUntil ahead of current time
     };
     const proofSignature = {
       type: "Ed25519Signature2020",
@@ -155,16 +191,21 @@ describe("OptimaVCVerifier", function () {
     expect(await optimaVCVerifier.verificationStatus(signerAddress)).to.equal(false);
 
     const vc = {
-      id: "123",
-      issuer: idpDid,
+      "@context": ["https://www.w3.org/ns/credentials/v2"],
+      id: "9cf1de20-7c7b-49e3-bac7-106a1c895dd0",
       type: ["OptimaV1Credential", "VerifiableCredential"],
-      validFrom: "2025-03-28T16:52:00.753Z", // validFrom in past
+      issuer: "did:key:zAeVG1300Ft4byWDW3NbuxooIjQvA8P16GCiL0Gj9Hg=",
+      validFrom: "2025-04-01T06:09:32.624Z", // validFrom in past
+      validUntil: "2028-04-01T06:09:32.624Z", // valid until ahead of current time
+      credentialSubject: {
+        publicAddress: "0xff96eb8458e7764FFB5995adf6F7138DE66F52d3",
+      },
     };
     const proofSignature = {
       type: "InvalidProofType", // invalid proof type
-      created: "2025-03-25T07:52:36.492Z",
+      created: "2025-04-01T06:09:32.625Z",
       proofPurpose: "assertionMethod",
-      proofValue: "z2oefavncyewguGve7hnJHcinLre2MTgeRSrxsAq9xkasDzxWhy9qaK4yWDKdjpyMGpsqEm5Zkkdv9Patqhdg8rPa",
+      proofValue: "z8oagLAKH4LwjVM56i5wBvM2EDuo1WC5pHmRGWe6Ha6BNEWeKGRiHBjHDD98jRBNe3TrSZGb6knsMTK1YwhseWPH",
     };
 
     await expect(
@@ -184,10 +225,11 @@ describe("OptimaVCVerifier", function () {
 
     const vc = {
       "@context": ["https://www.w3.org/ns/credentials/v2"],
-      id: "07590e64-3798-46b0-a4ed-e35b9705ba0a",
+      id: "9cf1de20-7c7b-49e3-bac7-106a1c895dd0",
       type: ["OptimaV1Credential", "VerifiableCredential"],
       issuer: "did:key:zAeVG1300Ft4byWDW3NbuxooIjQvA8P16GCiL0Gj9Hg=",
-      validFrom: "2025-03-28T16:52:00.753Z", // validFrom in past
+      validFrom: "2025-04-01T06:09:32.624Z", // validFrom in past
+      validUntil: "2028-04-01T06:09:32.624Z", // valid until ahead of current time
       credentialSubject: {
         publicAddress: "0xff96eb8458e7764FFB5995adf6F7138DE66F52d3",
       },
@@ -195,9 +237,9 @@ describe("OptimaVCVerifier", function () {
 
     const proofSignature = {
       type: "Ed25519Signature2020",
-      created: "2025-03-28T16:52:00.757Z",
+      created: "2025-04-01T06:09:32.625Z",
       proofPurpose: "assertionMethod",
-      proofValue: "z46q1Qa5DoNKRKYFU5KKGmLrSmkmtuywbN6UwBSG6AfHeK5tS8nxQCGPh1ZnZ6QiB63CT89GC3Gh68UYS8Q7xg4Tm",
+      proofValue: "z8oagLAKH4LwjVM56i5wBvM2EDuo1WC5pHmRGWe6Ha6BNEWeKGRiHBjHDD98jRBNe3TrSZGb6knsMTK1YwhseWPH",
     };
 
     const tx = await optimaVCVerifier

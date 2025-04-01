@@ -49,6 +49,13 @@ abstract contract VCVerifierBaseContract {
             revert InvalidData("validFrom date must be in the past");
         }
 
+        // Check the validUntil date is not in past
+        string memory validUntil = _parseJson("validUntil", vc);
+        uint256 validUntilUnix = _convertTimestampStringToUnix(validUntil);
+        if (validUntilUnix < block.timestamp) {
+            revert InvalidData("The validUntil date cannot be in the past");
+        }
+
         // Checking the proof signature is valid or not
         string memory proofType = _parseJson("type", proofSignature);
         string memory publicKey = _getProofPublicKey(proofType, issuerDid);
