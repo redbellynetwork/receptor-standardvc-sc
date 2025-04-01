@@ -15,9 +15,9 @@ contract OptimaVCVerifier is VCVerifierBaseContract {
 
     /**
      * @dev The function that will be executed after the verification is successful from the verifyCredential function.
-     * @param _userAddress address of the user that called the verifyCredential function
+     * @param userAddress address of the user that called the verifyCredential function
      */
-    function _postVerification(address _userAddress) internal override {
-        verificationStatus[_userAddress] = true;
+    function _postVerification(address userAddress) internal override {
+        verificationStatus[userAddress] = true;
     }
 }

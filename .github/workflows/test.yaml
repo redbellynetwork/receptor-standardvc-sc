@@ -6,6 +6,8 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-22.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -31,6 +33,7 @@ jobs:
           echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
           echo "RPC_URL=${{ vars.RPC_URL }}" >> $GITHUB_ENV
           echo "CHAIN_ID=${{ vars.CHAIN_ID }}" >> $GITHUB_ENV
+          echo "IDP_DID=${{ vars.IDP_DID }}" >> $GITHUB_ENV
       - name: Generate artifacts
         run: npm run compile
         shell: bash

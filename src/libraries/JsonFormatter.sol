@@ -70,19 +70,6 @@ library JsonFormatter {
         return string(trimmedBytes);
     }
 
-    /// @dev Converts a single bytes1 value to a string.
-    /// @param data The bytes1 value to be converted.
-    /// @return The resulting string representation of the bytes1 value.
-    function bytes1ToString(bytes1 data) external pure returns (string memory) {
-        // Create a new bytes array with size 1
-        bytes memory byteArray = new bytes(1);
-
-        byteArray[0] = data;
-
-        // Convert the bytes array to a string and return
-        return string(byteArray);
-    }
-
     /**
      * @dev Converts a base64 encoded string to bytes.
      * @param base64String The base64 encoded string to be converted.
