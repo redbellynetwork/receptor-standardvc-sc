@@ -4,6 +4,7 @@ pragma solidity 0.8.22;
 import {JsonFormatter} from "../libraries/JsonFormatter.sol";
 import {Base58} from "../libraries/Base58.sol";
 import {TimeParserUtils} from "../libraries/TimeParserUtils.sol";
+import {StringToAddress} from "../libraries/StringToAddress.sol";
 import {IIDPRegistry} from "../interfaces/IIDPRegistry.sol";
 import {IBootstrapContractsRegistry} from "@redbellynetwork/bootstrap-contracts/src/contracts/interfaces/IBootstrapContractsRegistry.sol";
 
@@ -54,6 +55,12 @@ abstract contract VCVerifierBaseContract {
         uint256 validUntilUnix = _convertTimestampStringToUnix(validUntil);
         if (validUntilUnix < block.timestamp) {
             revert InvalidData("The validUntil date cannot be in the past");
+        }
+
+        // Check public address in vcs is same as msg.sender.
+        string memory user = _parseJson("credentialSubject.publicAddress", vc);
+        if (StringToAddress.stringToAddress(user) != msg.sender) {
+            revert InvalidData("CredentialSubject publicAddress and msg.sender doesn't match");
         }
 
         // Checking the proof signature is valid or not

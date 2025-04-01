@@ -22,8 +22,17 @@ async function deployOptimaVCVerifierFixture() {
   const timeParserUtils = await TimeParserUtils.deploy();
   const timeParserUtilsAddress = await timeParserUtils.getAddress();
 
+  const StringToAddressLib = await ethers.getContractFactory("StringToAddress", signer);
+  const stringToAddressLib = await StringToAddressLib.deploy();
+  const stringToAddressLibAddress = await stringToAddressLib.getAddress();
+
   const OptimaVCVerifier = await ethers.getContractFactory("OptimaVCVerifier", {
-    libraries: { JsonFormatter: jsonFormatterAddress, Base58: base58Address, TimeParserUtils: timeParserUtilsAddress },
+    libraries: {
+      JsonFormatter: jsonFormatterAddress,
+      Base58: base58Address,
+      TimeParserUtils: timeParserUtilsAddress,
+      StringToAddress: stringToAddressLibAddress,
+    },
     signer,
   });
 
@@ -150,6 +159,42 @@ describe("OptimaVCVerifier", function () {
       .withArgs("The validUntil date cannot be in the past");
   });
 
+  it("Should revert, when public address is not same as msg.sender", async function () {
+    const { OptimaVCVerifier, signer, signerAddress } = await deployOptimaVCVerifierFixture();
+
+    const optimaVCVerifier = await OptimaVCVerifier.deploy(credentialType);
+    await optimaVCVerifier.waitForDeployment();
+
+    expect(await optimaVCVerifier.verificationStatus(signerAddress)).to.equal(false);
+
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 2);
+
+    const vc = {
+      id: "123",
+      issuer: idpDid,
+      type: ["OptimaV1Credential", "VerifiableCredential"],
+      validFrom: "2025-03-28T16:52:00.753Z", // validFrom in past
+      validUntil: currentDate.toISOString(), // validUntil ahead of current time
+      credentialSubject: {
+        publicAddress: "0x4bEDC01904D69db3683dEF0FCF6de852098c6b84",
+      },
+    };
+
+    const proofSignature = {
+      type: "Ed25519Signature2020",
+      created: "2025-03-25T07:52:36.492Z",
+      proofPurpose: "assertionMethod",
+      proofValue: "z8oagLAKH4LwjVM56i5wBvM2EDuo1WC5pHmRGWe6Ha6BNEWeKGRiHBjHDD98jRBNe3TrSZGb6knsMTK1YwhseWPH",
+    };
+
+    await expect(
+      optimaVCVerifier.connect(signer).verifyCredential(idpDid, canonicalize(vc)!, canonicalize(proofSignature)!)
+    )
+      .to.be.revertedWithCustomError(optimaVCVerifier, "InvalidData")
+      .withArgs("CredentialSubject publicAddress and msg.sender doesn't match");
+  });
+
   it("Should revert, when signature is not valid according to vc", async function () {
     const { OptimaVCVerifier, signer, signerAddress } = await deployOptimaVCVerifierFixture();
 
@@ -167,7 +212,11 @@ describe("OptimaVCVerifier", function () {
       type: ["OptimaV1Credential", "VerifiableCredential"],
       validFrom: "2025-03-28T16:52:00.753Z", // validFrom in past
       validUntil: currentDate.toISOString(), // validUntil ahead of current time
+      credentialSubject: {
+        publicAddress: "0xff96eb8458e7764FFB5995adf6F7138DE66F52d3",
+      },
     };
+
     const proofSignature = {
       type: "Ed25519Signature2020",
       created: "2025-03-25T07:52:36.492Z",
