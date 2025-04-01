@@ -6,7 +6,7 @@ import {Base58} from "../libraries/Base58.sol";
 import {TimeParserUtils} from "../libraries/TimeParserUtils.sol";
 import {StringToAddress} from "../libraries/StringToAddress.sol";
 import {IIDPRegistry} from "../interfaces/IIDPRegistry.sol";
-import {IBootstrapContractsRegistry} from "@redbellynetwork/bootstrap-contracts/src/contracts/interfaces/IBootstrapContractsRegistry.sol";
+import {IBootstrapContractsRegistry} from "../interfaces/IBootstrapContractsRegistry.sol";
 
 abstract contract VCVerifierBaseContract {
     /// @dev - The type of credential(schema) to verify
