@@ -6,10 +6,10 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "lint-check:solidity": "solhint \"src/**/*.sol\"",
-    "format-check:solidity": "prettier --check \"src/**/*.sol\"",
-    "lint-fix:solidity": "solhint --fix \"src/**/*.sol\"",
-    "format:solidity": "prettier --write \"src/**/*.sol\""
+    "lint-check:solidity": "solhint \"contracts/**/*.sol\"",
+    "format-check:solidity": "prettier --check \"contracts/**/*.sol\"",
+    "lint-fix:solidity": "solhint --fix \"contracts/**/*.sol\"",
+    "format:solidity": "prettier --write \"contracts/**/*.sol\""
   },
   "engines": {
     "node": ">=20.0.0"
@@ -38,6 +38,6 @@
     "url": "git+https://github.com/redbellynetwork/receptor-standardvc-sc.git"
   },
   "files": [
-    "./src/**/*.sol"
+    "./contracts/**/*.sol"
   ]
 }
