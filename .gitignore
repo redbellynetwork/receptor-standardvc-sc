@@ -13,3 +13,6 @@ node_modules
 /coverage.json
 
 .env
+
+package
+*.tgz
