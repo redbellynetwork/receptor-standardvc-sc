@@ -38,6 +38,7 @@
     "url": "git+https://github.com/redbellynetwork/receptor-standardvc-sc.git"
   },
   "files": [
-    "./contracts/**/*.sol"
+    "./contracts/**/*.sol",
+    "!/contracts/mocks/**/*"
   ]
 }
