@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.22;
 
-import {VCVerifierBaseContract} from "./VCVerifierBase.sol";
+import {VCVerifierBaseContract} from "../verifier/VCVerifierBase.sol";
 
 contract OptimaVCVerifier is VCVerifierBaseContract {
     /// @dev - Mapping to store verification status of each user
